@@ -67,9 +67,12 @@ I've only tested it on macOS (because it is meant for the Photos.app library aft
 
 ### Preparing in Photos.app
 
-- Make sure you have the "Download Originals to this Mac" option enabled in Photos.app: 
+Make sure you have the "Download Originals to this Mac" option enabled in Photos.app: 
+
 ![Download Originals](https://raw.githubusercontent.com/lambdan/PhotosLibraryExtractor/main/Screenshots/Download%20Originals.png)
-- Make sure your Photos are completely downloaded and up to date (the bottom of the Photos tab in Photos.app should just "Updated" or something similar): 
+
+Make sure your Photos are completely downloaded and up to date (the bottom of the Photos tab in Photos.app should just "Updated" or something similar): 
+
 ![Updated](https://raw.githubusercontent.com/lambdan/PhotosLibraryExtractor/main/Screenshots/Screenshot%202020-11-07%20at%2013.32.30.png)
 
 ### Prerequisites
@@ -110,13 +113,13 @@ If you want to start over and not skip any files, you can remove the `.PhotosLib
 
 ## What's up with these leftover unpaired IDs?
 
-In my library of 12000 photos, I got 16 unpaired IDs left. I'm guessing these are Live Photos were the video component of them was removed at some point which I don't remember. 
+I'm guessing these are Live Photos were the video component of them was removed at some point which I don't remember. There shouldn't be too many. In my library of over 10000 items, I got 16.
 
 The unpaired ID's are copied into the destination folder anyway, so you won't lose anything. You can see when the script processes them which paths they have so you can investigate if you want to, but I wouldn't worry about it.
 
 ## I got a lot of files in the "Unknown Dates" folder. What do I do?
 
-In my library of 12000 photos, 1417 files was left in this folder. For me, most of them are screenshots, photos I saved from Snapchat, or photos I saved to the library from the internet or Twitter. 
+For me, most of them were screenshots, photos I saved from Snapchat, or photos I saved to the library from the internet or Twitter. 
 
 There could however be some genuine photos in there too, like if your camera didn't have a date set or something. 
 
