@@ -1,8 +1,27 @@
-# Photos.app Library Exporter
+# Photos.app Library Extractor
 
 Exports photos from macOS Photos.app Library to Year/Month folders with dates as filenames. 
 
-Specifically made for macOS Photos.app libraries, as it matches Live Photos by looking at their Content ID tags, but it works for generic folders of photos too.
+Basically, you go from this:
+
+![Before](https://raw.githubusercontent.com/lambdan/PhotosLibraryExtractor/main/Screenshots/Screenshot%202020-11-07%20at%2011.34.21.png)
+
+To this:
+
+![After](https://raw.githubusercontent.com/lambdan/PhotosLibraryExtractor/main/Screenshots/Screenshot%202020-11-07%20at%2011.35.28.png)
+
+Specifically made for macOS Photos.app libraries, as it can match Live Photos by looking at their Content ID tags, but it works for generic folders of photos too.
+
+## Why not just use the "Export Unmodified Originals" option in Photos.app?
+
+In my experience:
+
+- I frequently get non-descript errors doing that
+- It's slow
+- The filenames aren't what I want
+- You can't practically extract all at once, you need to make Smart Albums by years or so to get smaller batches
+
+But feel free to try that option yourself. Maybe it's good for you!
 
 ## What is the structure of the Photos.app Library?
 
@@ -18,6 +37,12 @@ Apple conveniently has a Content ID that pairs the photo and video component. Ju
 
 Unfortunately, the photo's date is in one timezone and the video's date is in another, so this script sets the filename of the video based on the photos date, so that both the photo and video file have the same filenames except for the extension.
 
+Here you can see a screenshot of how the script handles Live Photos: 
+
+![Live Photos](https://raw.githubusercontent.com/lambdan/PhotosLibraryExtractor/main/Screenshots/Screenshot-%20Handling%20live%20photo.png)
+
+(Notice how the dates are two hours off from each other and that the MOV gets the same filename as the JPG.)
+
 ## Is this safe?
 
 It should be. I don't modify anything inside the input folder. I just read it and copy from it.
@@ -32,13 +57,16 @@ But if the destinaton file already exists, and the MD5 hashes aren't identical t
 
 You're meant to be able to re-use the same input and output folders repeatedly without re-doing the work every time.
 
+Here you can see a screenshot of what happens then the destination file(s) already exist: 
+![Destination Exists](https://raw.githubusercontent.com/lambdan/PhotosLibraryExtractor/main/Screenshots/Screenshot%20-%20handling%20duplicate%20destination.png)
+
 ## How do I use this?
 
 - This script is written using Python 3, so make sure you have that
 - I use [exiftool](https://exiftool.org) to read metadata from the images, so make sure you have that installed and accessible through the command line
     - If you're on macOS you can use [Brew](https://brew.sh) to install it: `brew install exiftool` 
 - The script uses the Python library [pyexiftool](https://github.com/smarnach/pyexiftool) to use exiftool
-    - Apparently, you can install that library using pip, but that didn't work for me. What worked for me was just having the `exiftool.py` file in the same folder as this script 
+    - Apparently, you can install that library using pip, but that didn't work for me (I get import module error). What worked for me was just having the `exiftool.py` file in the same folder as this script 
 - If you wanna edit the output folder or the date format or folder structure or anything like that, edit the script to your liking
     - By default the output folder (the organized folder) is in a folder called `out` in your current working folder
     - The folder structure is `YYYY/MM`, along with a folder called `Unknown Dates` for photos with... yep, unknown dates
@@ -52,7 +80,7 @@ I've only tested it on macOS (because it is meant for the Photos.app library aft
 
 ## What's up with these leftover unpaired IDs?
 
-In my library of 12000 photos, I got 16 unpaired IDs left. I'm guessing these are Live Photos were the video component of them was removed. 
+In my library of 12000 photos, I got 16 unpaired IDs left. I'm guessing these are Live Photos were the video component of them was removed at some point which I don't remember. 
 
 The unpaired ID's are copied into the destination folder anyway, so you won't lose anything. You can see when the script processes them which paths they have so you can investigate if you want to, but I wouldn't worry about it.
 
