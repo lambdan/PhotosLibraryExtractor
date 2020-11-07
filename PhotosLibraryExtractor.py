@@ -1,12 +1,19 @@
 import exiftool, sys, shutil, os, hashlib
+from argparse import ArgumentParser
 #exiftool: http://github.com/smarnach/pyexiftool
 
-in_dir = sys.argv[1]
-out_dir = './out/'
-already_processed_db = './.PhotosLibraryExtractor_ProcessedFiles'
+parser = ArgumentParser()
+parser.add_argument('-i', action='store', dest='input', help='Folder with pictures you want to process a.k.a. input folder', required=True)
+parser.add_argument('-o', action='store', dest='output', help='Photos will be copied to this folder a.k.a. output folder', required=True)
+parsed = parser.parse_args()
 
-in_dir = os.path.abspath(in_dir)
-out_dir = os.path.abspath(out_dir)
+in_dir = os.path.abspath(parsed.input)
+out_dir = os.path.abspath(parsed.output)
+already_processed_db = './PhotosLibraryExtractor_ProcessedFiles'
+
+if not os.path.isdir(in_dir):
+	print("Error! This doesn't seem to be a folder:", in_dir)
+	sys.exit(1)
 
 if not os.path.isdir(out_dir):
 	print("Making output folder:", out_dir)

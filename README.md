@@ -95,11 +95,11 @@ If you wanna edit the output folder or the date format or folder structure or an
 
 Run the script: 
     
-    python3 PhotosLibraryExtractor.py /folder/with/pictures/
+    python3 PhotosLibraryExtractor.py -i /folder/with/pictures/ -o /destination/
 
 If you are processing a Photos.app Library you should use the `originals` sub folder (the easiest way to get to it is to open the Library in Finder (by right clikcing it and selecting _Show Package Contents_ and dragging and dropping the originals folder onto your Terminal): 
 
-    python3 PhotosLibraryExtractor.py "~/Photos Library.photoslibrary/originals"
+    python3 PhotosLibraryExtractor.py -i "~/Photos Library.photoslibrary/originals" -o /destination/
 
 The script is very verbose, almost annoyingly so, because these are highly valuable photos we are dealing with and I want you to know exactly what is going on.
 
