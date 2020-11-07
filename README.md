@@ -64,25 +64,47 @@ Here you can see a screenshot of what happens then the destination file(s) alrea
 
 I've only tested it on macOS (because it is meant for the Photos.app library afterall), but I don't see any reason why it wouldn't work on Windows or Linux.
 
+
+### Preparing in Photos.app
+
 - Make sure you have the "Download Originals to this Mac" option enabled in Photos.app: ![Download Originals](https://raw.githubusercontent.com/lambdan/PhotosLibraryExtractor/main/Screenshots/Download%20Originals.png)
-- Make sure your Photos are completely downloaded and up to date (the bottom of the Photos tab in Photos.app should just "Updated" or something similar)
+- Make sure your Photos are completely downloaded and up to date (the bottom of the Photos tab in Photos.app should just "Updated" or something similar): ![Updated](https://raw.githubusercontent.com/lambdan/PhotosLibraryExtractor/main/Screenshots/Screenshot%202020-11-07%20at%2013.32.30.png)
+
+### Prerequisites
+
 - This script is written using Python 3, so make sure you have that
 - I use [exiftool](https://exiftool.org) to read metadata from the images, so make sure you have that installed and accessible through the command line
     - If you're on macOS you can use [Brew](https://brew.sh) to install it: `brew install exiftool` 
 - The script uses the Python library [pyexiftool](https://github.com/smarnach/pyexiftool) to use exiftool
     - Apparently, you can install that library using pip, but that didn't work for me (I get import module error). What worked for me was just having the `exiftool.py` file in the same folder as this script 
-- If you wanna edit the output folder or the date format or folder structure or anything like that, edit the script to your liking
-    - By default the output folder (the organized folder) is in a folder called `out` in your current working folder
-    - The folder structure is `YYYY/MM`, along with a folder called `Unknown Dates` for photos with... yep, unknown dates
-    - The filename structure is `YYYYMMDD-HHMMSS.ext` with a number added if its an already existing file, like `YYYYMMDD-HHMMSS-1.ext`
-- Run the script by using `python3 PhotosLibraryExtractor.py /folder/with/pictures/`
-    - If you are processing a Photos.app Library you should use the `originals` sub folder: `python3 PhotosLibraryExtractor.py "~/Photos/Photos Library.app/originals/`
+
+### Changing Settings
+
+If you wanna edit the output folder or the date format or folder structure or anything like that, edit the script to your liking. (Ideally I should make this nicer, but I think my defaults are pretty sane, so it's not a high priority)
+
+- By default the output folder (the organized folder) is in a folder called `out` in your current working folder
+- The folder structure is `YYYY/MM`, along with a folder called `Unknown Dates` for photos with... yep, unknown dates
+- The filename structure is `YYYYMMDD-HHMMSS.ext` with a number added if its an already existing file, like `YYYYMMDD-HHMMSS-1.ext`
+
+### Running the Script
+
+Run the script: 
+    
+    python3 PhotosLibraryExtractor.py /folder/with/pictures/
+
+If you are processing a Photos.app Library you should use the `originals` sub folder: 
+
+    python3 PhotosLibraryExtractor.py "~/Photos/Photos Library.app/originals/
 
 The script is very verbose, almost annoyingly so, because these are highly valuable photos we are dealing with and I want you to know exactly what is going on.
 
+### Future Runs
+
 Future runs will skip previously processed files. The first run for me with my 12000 photos took about 1 hour to finish on my 13-inch MacBook Pro (my Photo Library is on a mechanical drive though so that probably didn't help). Future runs where just a couple of photos was added was done in a matter of seconds. 
 
-If you want to start over, you can remove the `.PhotosLibraryExtractor_ProcessedFiles` file. It's just a simple file with one filepath per line, so you can even just remove the one file you don't want to be skipped if you can find it in there.
+### Starting Over
+
+If you want to start over and not skip any files, you can remove the `.PhotosLibraryExtractor_ProcessedFiles` file. It's just a simple file with one filepath per line, so you can even just remove the one file you don't want to be skipped if you can find it in there.
 
 ## What's up with these leftover unpaired IDs?
 
