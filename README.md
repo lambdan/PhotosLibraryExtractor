@@ -62,6 +62,8 @@ Here you can see a screenshot of what happens then the destination file(s) alrea
 
 ## How do I use this?
 
+I've only tested it on macOS (because it is meant for the Photos.app library afterall), but I don't see any reason why it wouldn't work on Windows or Linux.
+
 - This script is written using Python 3, so make sure you have that
 - I use [exiftool](https://exiftool.org) to read metadata from the images, so make sure you have that installed and accessible through the command line
     - If you're on macOS you can use [Brew](https://brew.sh) to install it: `brew install exiftool` 
@@ -76,7 +78,9 @@ Here you can see a screenshot of what happens then the destination file(s) alrea
 
 The script is very verbose, almost annoyingly so, because these are highly valuable photos we are dealing with and I want you to know exactly what is going on.
 
-I've only tested it on macOS (because it is meant for the Photos.app library afterall), but I don't see any reason why it wouldn't work on Windows or Linux.
+Future runs will skip previously processed files. The first run for me with my 12000 photos took about 1 hour to finish on my 13-inch MacBook Pro (my Photo Library is on a mechanical drive though so that probably didn't help). Future runs where just a couple of photos was added was done in a matter of seconds. 
+
+If you want to start over, you can remove the `.PhotosLibraryExtractor_ProcessedFiles` file. It's just a simple file with one filepath per line, so you can even just remove the one file you don't want to be skipped if you can find it in there.
 
 ## What's up with these leftover unpaired IDs?
 
