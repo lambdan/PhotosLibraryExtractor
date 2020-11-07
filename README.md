@@ -1,6 +1,8 @@
 # Photos.app Library Extractor
 
-Exports photos from macOS Photos.app Library to Year/Month folders with dates as filenames. 
+Exports photos from macOS Photos.app Library to Year/Month folders with dates as filenames. Perfect for a local offline backup.
+
+Specifically made for macOS Photos.app libraries, as it can match Live Photos by looking at their Content ID tags, but it works for generic folders of photos too.
 
 Basically, you go from this:
 
@@ -9,8 +11,6 @@ Basically, you go from this:
 To this:
 
 ![After](https://raw.githubusercontent.com/lambdan/PhotosLibraryExtractor/main/Screenshots/Screenshot%202020-11-07%20at%2011.35.28.png)
-
-Specifically made for macOS Photos.app libraries, as it can match Live Photos by looking at their Content ID tags, but it works for generic folders of photos too.
 
 ## Why not just use the "Export Unmodified Originals" option in Photos.app?
 
