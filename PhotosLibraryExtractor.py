@@ -120,6 +120,16 @@ def copy_handler(input_path,destination):
 	print("Copying to:", final_path)
 	shutil.copy(input_path, final_path)
 
+
+def add_to_processed_files(filepath):
+	if not os.path.isfile(already_processed_db):
+		with open(already_processed_db, 'a') as sf:
+			sf.write('# This is just a list of files that we have handled previously to speed up future runs\n')
+			sf.write('# Feel free to delete it if you want to start over\n')
+
+	with open(already_processed_db, 'a') as sf:
+		sf.write(filepath + '\n')
+
 # Use this for finding metadata tags
 #with exiftool.ExifTool() as et:
 #		metadata = et.get_metadata(sys.argv[1])
@@ -143,6 +153,8 @@ if os.path.isfile(already_processed_db):
 	print("They will be skipped this run. If you want to start over, delete the file:", already_processed_db)
 	print("---")
 
+skipped_files = len(previously_handled_files)
+
 # Main loop
 for dirpath, dirnames, filenames in os.walk(in_dir):
 	for f in filenames:
@@ -163,6 +175,7 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 		if md5 in handled_files:
 			print("Duplicate file:", f)
 			duplicate_files.append(in_file)
+			add_to_processed_files(in_file)
 			print("-")
 			continue
 		
@@ -212,13 +225,7 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 			copy_handler(in_file, dest)
 
 		handled_files.append(md5)
-		previously_handled_files.append(in_file)
-		if not os.path.isfile(already_processed_db):
-			with open(already_processed_db, 'a') as sf:
-				sf.write('# This is just a list of files that we have handled previously to speed up future runs\n')
-				sf.write('# Feel free to delete it if you want to start over\n')
-		with open(already_processed_db, 'a') as sf:
-			sf.write(in_file + '\n')
+		add_to_processed_files(in_file)
 		print('-')
 
 
@@ -235,5 +242,8 @@ for f in contentID_filenames:
 	print('-')
 print("---")
 
+skipped_files += len(duplicate_files)
+
 print("New files:", len(handled_files))
-print("Ignored files (duplicates):", len(duplicate_files))
+print("Skipped files:", skipped_files)
+#print("Ignored files (duplicates):", len(duplicate_files))
