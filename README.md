@@ -1,2 +1,65 @@
-# PhotosLibraryExtractor
-Exports photos from macOS Photos.app Library to Year/Month folders with dates as filenames
+# Photos.app Library Exporter
+
+Exports photos from macOS Photos.app Library to Year/Month folders with dates as filenames. 
+
+Specifically made for macOS Photos.app libraries, as it matches Live Photos by looking at their Content ID tags, but it works for generic folders of photos too.
+
+## What is the structure of the Photos.app Library?
+
+The `Photos Library.photoslibrary` is basically a folder! If you right click it in macOS you can choose "Show Package Contents" and in there you find folders. 
+
+Most interesting to us is the originals folder as that folder seems to contain unmodified original files. 
+
+Unfortunately, inside the originals folder is a mess of scary folders and scary file names that are essentially random. Luckily for us, the files themselves seem to be untouched and contain a lot of metadata which we can read, such as the date the photo was taken, which we can use to get a nicer filename.
+
+## How are Live Photos paired?
+
+Apple conveniently has a Content ID that pairs the photo and video component. Just read the tags and if it's the same Content ID: it's a pair. 
+
+Unfortunately, the photo's date is in one timezone and the video's date is in another, so this script sets the filename of the video based on the photos date, so that both the photo and video file have the same filenames except for the extension.
+
+## Is this safe?
+
+It should be. I don't modify anything inside the input folder. I just read it and copy from it.
+
+## How are duplicates handled?
+
+Every input file gets hashed using MD5. If it's a hash we've already had, the file is skipped. 
+
+If the destination file already exists, the new file and the existing file gets MD5 hashed and compared to see if they're identical, and if so, the new file isn't copied.
+
+But if the destinaton file already exists, and the MD5 hashes aren't identical the new file is copied with a number appended to it. In case that the new filename with a number appended to it is also already existing then we also MD5 compare them, and so until we either find a identical match or we find a free filename.
+
+You're meant to be able to re-use the same input and output folders repeatedly without re-doing the work every time.
+
+## How do I use this?
+
+- This script is written using Python 3, so make sure you have that
+- I use [exiftool](https://exiftool.org) to read metadata from the images, so make sure you have that installed and accessible through the command line
+    - If you're on macOS you can use [Brew](https://brew.sh) to install it: `brew install exiftool` 
+- The script uses the Python library [pyexiftool](https://github.com/smarnach/pyexiftool) to use exiftool
+    - Apparently, you can install that library using pip, but that didn't work for me. What worked for me was just having the `exiftool.py` file in the same folder as this script 
+- If you wanna edit the output folder or the date format or folder structure or anything like that, edit the script to your liking
+    - By default the output folder (the organized folder) is in a folder called `out` in your current working folder
+    - The folder structure is `YYYY/MM`, along with a folder called `Unknown Dates` for photos with... yep, unknown dates
+    - The filename structure is `YYYYMMDD-HHMMSS.ext` with a number added if its an already existing file, like `YYYYMMDD-HHMMSS-1.ext`
+- Run the script by using `python3 PhotosLibraryExtractor.py /folder/with/pictures/`
+    - If you are processing a Photos.app Library you should use the `originals` sub folder: `python3 PhotosLibraryExtractor.py "~/Photos/Photos Library.app/originals/`
+
+The script is very verbose, almost annoyingly so, because these are highly valuable photos we are dealing with and I want you to know exactly what is going on.
+
+I've only tested it on macOS (because it is meant for the Photos.app library afterall), but I don't see any reason why it wouldn't work on Windows or Linux.
+
+## What's up with these leftover unpaired IDs?
+
+In my library of 12000 photos, I got 16 unpaired IDs left. I'm guessing these are Live Photos were the video component of them was removed. 
+
+The unpaired ID's are copied into the destination folder anyway, so you won't lose anything. You can see when the script processes them which paths they have so you can investigate if you want to, but I wouldn't worry about it.
+
+## I got a lot of files in the "Unknown Dates" folder. What do I do?
+
+In my library of 12000 photos, 1417 files was left in this folder. For me, most of them are screenshots, photos I saved from Snapchat, or photos I saved to the library from the internet or Twitter. 
+
+There could however be some genuine photos in there too, like if your camera didn't have a date set or something. 
+
+So it is unfortunately a thing I can't really help you with. I would just keep it around in case there is anything important in there.
