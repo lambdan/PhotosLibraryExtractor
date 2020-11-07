@@ -83,14 +83,6 @@ Make sure your Photos are completely downloaded and up to date (the bottom of th
 - The script uses the Python library [pyexiftool](https://github.com/smarnach/pyexiftool) to use exiftool
     - Apparently, you can install that library using pip, but that didn't work for me (I get import module error). What worked for me was just having the `exiftool.py` file in the same folder as this script 
 
-### Changing Settings
-
-If you wanna edit the output folder or the date format or folder structure or anything like that, edit the script to your liking. (Ideally I should make this nicer, but I think my defaults are pretty sane, so it's not a high priority)
-
-- By default the output folder (the organized folder) is in a folder called `out` in your current working folder
-- The folder structure is `YYYY/MM`, along with a folder called `Unknown Dates` for photos with... yep, unknown dates
-- The filename structure is `YYYYMMDD-HHMMSS.ext` with a number added if its an already existing file, like `YYYYMMDD-HHMMSS-1.ext`
-
 ### Running the Script
 
 Run the script: 
@@ -105,9 +97,9 @@ The script is very verbose, almost annoyingly so, because these are highly valua
 
 ### The "DB" File
 
-Files that have been processed are added to a "DB" file. By default this DB file is in the same folder as the script was run in: `'./PhotosLibraryExtractor_ProcessedFiles'`
+Files that have been processed are added to a "DB" file. By default this DB file is in the same folder as the script was run in: `./PhotosLibraryExtractor_ProcessedFiles`
 
-...but it can also be specified with the `-db` parameter (which is useful if you're working with multiple libraries using the same script). I recommend keeping the DB file in the same folder as the destination (not in it, but next to it).
+But it can also be specified with the `-db` parameter, which is useful if you're working with multiple libraries using the same script, or you just want the DB file somewhere else. I recommend keeping the DB file in the same folder as the destination (not in it, but next to it).
 
 This DB file is useful for future runs as files that have been already processed are skipped, significantly speeding up a run. 
 
