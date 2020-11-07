@@ -64,6 +64,8 @@ Here you can see a screenshot of what happens then the destination file(s) alrea
 
 I've only tested it on macOS (because it is meant for the Photos.app library afterall), but I don't see any reason why it wouldn't work on Windows or Linux.
 
+- Make sure you have the "Download Originals to this Mac" option enabled in Photos.app: ![Download Originals](https://raw.githubusercontent.com/lambdan/PhotosLibraryExtractor/main/Screenshots/Download%20Originals.png)
+- Make sure your Photos are completely downloaded and up to date (the bottom of the Photos tab in Photos.app should just "Updated" or something similar)
 - This script is written using Python 3, so make sure you have that
 - I use [exiftool](https://exiftool.org) to read metadata from the images, so make sure you have that installed and accessible through the command line
     - If you're on macOS you can use [Brew](https://brew.sh) to install it: `brew install exiftool` 
