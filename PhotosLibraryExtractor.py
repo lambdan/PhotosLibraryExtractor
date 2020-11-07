@@ -17,6 +17,7 @@ contentID_IDs = []
 handled_files = []
 previously_handled_files = []
 duplicate_files = []
+files_copied = 0
 
 def md5sum(filename):
 	size = os.path.getsize(filename)
@@ -82,7 +83,7 @@ def destination_from_date(in_date, in_path):
 	return final
 
 def copy_handler(input_path,destination):
-
+	global files_copied
 	dest_folder = os.path.dirname(destination)
 
 	if not os.path.isdir(dest_folder):
@@ -118,6 +119,7 @@ def copy_handler(input_path,destination):
 		i += 1
 
 	print("Copying to:", final_path)
+	files_copied += 1
 	shutil.copy(input_path, final_path)
 
 
@@ -230,20 +232,22 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 
 
 # now handle leftover files in contentID_filenames
-print("There are", len(contentID_filenames), "files with unpaired Content IDs left")
-for f in contentID_filenames:
-	info = grab_metadata(f)
-	d = info['date']
-	print('Input:', f)
-	if d:
-		print(d)
-	dest = destination_from_date(d, f)
-	copy_handler(f, dest)
-	print('-')
-print("---")
+if len(contentID_filenames) > 0:
+	print("There are", len(contentID_filenames), "files with unpaired Content IDs left")
+	for f in contentID_filenames:
+		info = grab_metadata(f)
+		d = info['date']
+		print('Input:', f)
+		if d:
+			print(d)
+		dest = destination_from_date(d, f)
+		copy_handler(f, dest)
+		print('-')
+	print("---")
 
 skipped_files += len(duplicate_files)
 
-print("New files:", len(handled_files))
+print("Files processed:", len(handled_files))
+print("Files copied:", files_copied)
 print("Skipped files:", skipped_files)
 #print("Ignored files (duplicates):", len(duplicate_files))
