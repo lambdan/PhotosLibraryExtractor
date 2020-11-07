@@ -103,13 +103,15 @@ If you are processing a Photos.app Library you should use the `originals` sub fo
 
 The script is very verbose, almost annoyingly so, because these are highly valuable photos we are dealing with and I want you to know exactly what is going on.
 
-### Future Runs
+### The "DB" File
 
-Future runs will skip previously processed files. The first run for me with my 12000 photos took about 1 hour to finish on my 13-inch MacBook Pro (my Photo Library is on a mechanical drive though so that probably didn't help). Future runs where just a couple of photos was added was done in a matter of seconds. 
+Files that have been processed are added to a "DB" file. By default this DB file is in the same folder as the script was run in: `'./PhotosLibraryExtractor_ProcessedFiles'`
 
-### Starting Over
+...but it can also be specified with the `-db` parameter (which is useful if you're working with multiple libraries using the same script). I recommend keeping the DB file in the same folder as the destination (not in it, but next to it).
 
-If you want to start over and not skip any files, you can remove the `.PhotosLibraryExtractor_ProcessedFiles` file. It's just a simple file with one filepath per line, so you can even just remove the one file you don't want to be skipped if you can find it in there.
+This DB file is useful for future runs as files that have been already processed are skipped, significantly speeding up a run. 
+
+The DB file is just a plain text file with one filepath per line, so you can go in and delete a specific line for a file if you want to just re-process that file, or you can just remove the entire DB file if you wanna start over from scratch.
 
 ## What's up with these leftover unpaired IDs?
 

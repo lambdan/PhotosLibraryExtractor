@@ -5,11 +5,20 @@ from argparse import ArgumentParser
 parser = ArgumentParser()
 parser.add_argument('-i', action='store', dest='input', help='Folder with pictures you want to process a.k.a. input folder', required=True)
 parser.add_argument('-o', action='store', dest='output', help='Photos will be copied to this folder a.k.a. output folder', required=True)
+parser.add_argument('-db', action='store', dest='db_path', help='Path to DB file (which is just a list of processed files)', required=False)
 parsed = parser.parse_args()
 
 in_dir = os.path.abspath(parsed.input)
 out_dir = os.path.abspath(parsed.output)
-already_processed_db = './PhotosLibraryExtractor_ProcessedFiles'
+if parsed.db_path:
+	already_processed_db = os.path.abspath(parsed.db_path)
+else:
+	already_processed_db = './PhotosLibraryExtractor_ProcessedFiles'
+
+print("Input folder:", in_dir)
+print("Destination:", out_dir)
+print("DB file:", already_processed_db)
+print("---")
 
 if not os.path.isdir(in_dir):
 	print("Error! This doesn't seem to be a folder:", in_dir)
