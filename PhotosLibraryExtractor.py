@@ -3,6 +3,7 @@ import exiftool, sys, shutil, os, hashlib
 
 in_dir = sys.argv[1]
 out_dir = './out/'
+already_processed_db = './.PhotosLibraryExtractor_ProcessedFiles'
 
 in_dir = os.path.abspath(in_dir)
 out_dir = os.path.abspath(out_dir)
@@ -14,6 +15,7 @@ if not os.path.isdir(out_dir):
 contentID_filenames = [] # for Live Photos
 contentID_IDs = []
 handled_files = []
+previously_handled_files = []
 duplicate_files = []
 
 def md5sum(filename):
@@ -130,6 +132,17 @@ def copy_handler(input_path,destination):
 #sys.exit(1)
 
 
+# Read previously handled files
+if os.path.isfile(already_processed_db):
+	print("Reading", already_processed_db)
+	with open(already_processed_db) as f:
+		lines = f.readlines()
+	for line in lines:
+		previously_handled_files.append(line.rstrip())
+	print(len(previously_handled_files), "files read from", already_processed_db)
+	print("They will be skipped this run. If you want to start over, delete the file:", already_processed_db)
+	print("---")
+
 # Main loop
 for dirpath, dirnames, filenames in os.walk(in_dir):
 	for f in filenames:
@@ -137,6 +150,12 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 			continue # ignore .DS_Store files
 
 		in_file = os.path.abspath(os.path.join(dirpath,f))
+
+		if in_file in previously_handled_files:
+			#print("Skipping because we have handled it before:", in_file)
+			#print("-")
+			continue
+
 		print("Input:", in_file)
 
 		
@@ -193,6 +212,13 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 			copy_handler(in_file, dest)
 
 		handled_files.append(md5)
+		previously_handled_files.append(in_file)
+		if not os.path.isfile(already_processed_db):
+			with open(already_processed_db, 'a') as sf:
+				sf.write('# This is just a list of files that we have handled previously to speed up future runs\n')
+				sf.write('# Feel free to delete it if you want to start over\n')
+		with open(already_processed_db, 'a') as sf:
+			sf.write(in_file + '\n')
 		print('-')
 
 
@@ -207,7 +233,7 @@ for f in contentID_filenames:
 	dest = destination_from_date(d, f)
 	copy_handler(f, dest)
 	print('-')
-print("-")
+print("---")
 
-print("Handled files:", len(handled_files))
-print("Ignored files (dupicates):", len(duplicate_files))
+print("New files:", len(handled_files))
+print("Ignored files (duplicates):", len(duplicate_files))
