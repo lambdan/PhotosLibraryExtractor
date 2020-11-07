@@ -71,7 +71,7 @@ Make sure you have the "Download Originals to this Mac" option enabled in Photos
 
 ![Download Originals](https://raw.githubusercontent.com/lambdan/PhotosLibraryExtractor/main/Screenshots/Download%20Originals.png)
 
-Make sure your Photos are completely downloaded and up to date (the bottom of the Photos tab in Photos.app should just "Updated" or something similar): 
+Make sure your Photos are completely downloaded and up to date (the bottom of the Photos tab in Photos.app should just say "Updated" or something similar): 
 
 ![Updated](https://raw.githubusercontent.com/lambdan/PhotosLibraryExtractor/main/Screenshots/Screenshot%202020-11-07%20at%2013.32.30.png)
 
