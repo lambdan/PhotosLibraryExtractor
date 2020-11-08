@@ -95,15 +95,15 @@ If you are processing a Photos.app Library you should use the `originals` sub fo
 
 The script is very verbose, almost annoyingly so, because these are highly valuable photos we are dealing with and I want you to know exactly what is going on.
 
-### The "DB" File
+### The "PLEDB" File
 
-Files that have been processed are added to a "DB" file. By default this DB file is in the same folder as the script was run in: `./PhotosLibraryExtractor_ProcessedFiles`
+Files that have been processed are added to a PLEDB (Photos Library Extractor Data Base) file. By default this PLEDB file is in the destination folder.
 
-But it can also be specified with the `-db` parameter, which is useful if you're working with multiple libraries using the same script, or you just want the DB file somewhere else. I recommend keeping the DB file in the same folder as the destination (not in it, but next to it).
+It can also be specified with the `-db` parameter if you wanna have it outside of your precious folder of photos.
 
-This DB file is useful for future runs as files that have been already processed are skipped, significantly speeding up a run. 
+This PLEDB file is useful for future runs as files that have been already processed are skipped, significantly speeding up a run. 
 
-The DB file is just a plain text file with one filepath per line, so you can go in and delete a specific line for a file if you want to just re-process that file, or you can just remove the entire DB file if you wanna start over from scratch.
+The PLEDB file is just a plain text file with one filepath per line, so you can go in and delete a specific line for a file if you want to just re-process that file, or you can just remove the entire PLEDB file if you wanna start over from scratch.
 
 ## What's up with these leftover unpaired IDs?
 

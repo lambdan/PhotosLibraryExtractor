@@ -5,7 +5,7 @@ from argparse import ArgumentParser
 parser = ArgumentParser()
 parser.add_argument('-i', action='store', dest='input', help='Folder with pictures you want to process a.k.a. input folder', required=True)
 parser.add_argument('-o', action='store', dest='output', help='Photos will be copied to this folder a.k.a. output folder', required=True)
-parser.add_argument('-db', action='store', dest='db_path', help='Path to DB file (which is just a list of processed files)', required=False)
+parser.add_argument('-db', action='store', dest='db_path', help='Path to PLEDB file', required=False)
 parsed = parser.parse_args()
 
 in_dir = os.path.abspath(parsed.input)
@@ -13,7 +13,7 @@ out_dir = os.path.abspath(parsed.output)
 if parsed.db_path:
 	already_processed_db = os.path.abspath(parsed.db_path)
 else:
-	already_processed_db = './PhotosLibraryExtractor_ProcessedFiles'
+	already_processed_db = os.path.join(out_dir, 'PLEDB')
 
 print("Input folder:", in_dir)
 print("Destination:", out_dir)
@@ -140,11 +140,6 @@ def copy_handler(input_path,destination):
 
 
 def add_to_processed_files(filepath):
-	if not os.path.isfile(already_processed_db):
-		with open(already_processed_db, 'a') as sf:
-			sf.write('# This is just a list of files that we have handled previously to speed up future runs\n')
-			sf.write('# Feel free to delete it if you want to start over\n')
-
 	with open(already_processed_db, 'a') as sf:
 		sf.write(filepath + '\n')
 
@@ -167,8 +162,8 @@ if os.path.isfile(already_processed_db):
 		lines = f.readlines()
 	for line in lines:
 		previously_handled_files.append(line.rstrip())
-	print(len(previously_handled_files), "files read from", already_processed_db)
-	print("They will be skipped this run. If you want to start over, delete the file:", already_processed_db)
+	print(len(previously_handled_files), "files in PLEDB")
+	print("They will be skipped this run. If you want to start fresh, delete the file:", already_processed_db)
 	print("---")
 
 skipped_files = len(previously_handled_files)
