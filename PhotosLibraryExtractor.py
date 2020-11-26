@@ -106,14 +106,17 @@ def copy_handler(input_path,destination):
 		#print("Making folder:", dest_folder)
 		os.makedirs(dest_folder)
 
-	final_path = destination
-
 	# check if file already exists, if so hash it
 	# TODO just reuse the md5sum we got in the main loop isntead of redoing it here?
 
-	i = 1
 	base = os.path.splitext( os.path.basename(destination) )[0]
 	ext = os.path.splitext( os.path.basename(destination) )[1]
+	if ext.lower() == ".jpeg":
+		print("Changing .jpeg to .jpg")
+		ext = ".jpg"
+
+	final_path = os.path.join(dest_folder, base + ext)
+	i = 1
 	while os.path.isfile(final_path):
 		#print("File already exists, incrementing number")
 
