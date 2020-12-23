@@ -9,6 +9,13 @@ parser.add_argument('-db', action='store', dest='db_path', help='Path to PLEDB f
 parsed = parser.parse_args()
 
 in_dir = os.path.abspath(parsed.input)
+
+# Check if input is a .photoslibrary, if so correct it to point to the originals folder
+if ".photoslibrary" in in_dir:
+	test_PhotosLibrary_path = os.path.join(in_dir, "originals/")
+	if os.path.isdir(test_PhotosLibrary_path):
+		in_dir = test_PhotosLibrary_path
+
 out_dir = os.path.abspath(parsed.output)
 if parsed.db_path:
 	already_processed_db = os.path.abspath(parsed.db_path)
