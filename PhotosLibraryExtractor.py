@@ -99,13 +99,14 @@ def destination_from_date(in_date, in_path):
 		ext = os.path.splitext(f)[1]
 
 		folder_path = os.path.join(out_dir, year, month)
-		filename = year + month + day + "-" + hour + minute + second + ext
+		filename = year + "-" + month + "-" + day + "_" + hour + "." + minute + "." + second + ext
+		#filename = year + month + day + "-" + hour + minute + second + ext
 	else: # no date
 		folder_path = os.path.join(out_dir, "Unknown Dates")
 		filename = f
 
 	final = os.path.join(folder_path, filename)
-	print("Destination:", final)
+	#print("Destination:", final)
 	#print("DIR NAME:", os.path.dirname(final))
 	return final
 
@@ -126,29 +127,31 @@ def copy_handler(input_path,destination):
 		print("Changing .jpeg to .jpg")
 		ext = ".jpg"
 
-	final_path = os.path.join(dest_folder, base + ext)
-	i = 1
+	i = 0
+	new_name = base + "-" + str(i) + ext
+	final_path = (os.path.join(dest_folder, new_name))
 	while os.path.isfile(final_path):
 		#print("File already exists, incrementing number")
 
-		print("Hmm, this file already exists:", final_path)
-		print("Let's see if its identical to this file we're trying to copy:")
+		#print("Hmm, this file already exists:", final_path)
+		#print("Let's see if its identical to this file we're trying to copy:")
 		existing_file_hash = md5sum(final_path)
-		print("MD5 of existing file:\t", existing_file_hash)
+		#print("MD5 of existing file:\t", existing_file_hash)
 		new_file_hash = md5sum(input_path)
-		print("MD5 of new file:\t", new_file_hash)
+		#print("MD5 of new file:\t", new_file_hash)
 
 		if existing_file_hash == new_file_hash:
-			print("Yep, they're identical. Moving on...")
+			#print("Yep, they're identical. Moving on...")
 			return
 		else:
-			print("Oh! They're not identical! I'll copy the new file and add a number to it then. Let's try with number " + str(i) + ".")
+			#print("Oh! They're not identical! I'll copy the new file and add a number to it then. Let's try with number " + str(i) + ".")
 			new_name = base + "-" + str(i) + ext
 			final_path = (os.path.join(dest_folder, new_name))
 		#print("Let's try with this instead:", final_path)
 		i += 1
 
-	print("Copying to:", final_path)
+	#print("Copying to:", final_path)
+	print(input_path, "-->", final_path)
 	files_copied += 1
 	shutil.copy(input_path, final_path)
 
@@ -196,7 +199,7 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 			#print("-")
 			continue
 
-		print("Input:", in_file)
+		#print("Input:", in_file)
 
 		
 		md5 = md5sum(in_file)
@@ -212,10 +215,10 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 		cID = info['content_ID']
 		ext = os.path.splitext(in_file)[1]
 
-		if d:
-			print("Date:", d)
-		if cID:
-			print("Content ID:", cID)
+		#if d:
+		#	print("Date:", d)
+		#if cID:
+		#	print("Content ID:", cID)
 
 		if cID: # has content id, could be a live photo
 			if cID in contentID_IDs: # Found live photo?
@@ -243,7 +246,7 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 				contentID_IDs.remove(cID)
 				contentID_filenames.remove(matched_filename)
 			else:
-				print("This seems to be part of a Live Photo... let's wait for the other part before we do anything")
+				#print("This seems to be part of a Live Photo... let's wait for the other part before we do anything")
 				contentID_filenames.append(in_file)
 				contentID_IDs.append(cID)
 				
@@ -254,7 +257,7 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 
 		handled_files.append(md5)
 		add_to_processed_files(in_file)
-		print('-')
+		#print('-')
 
 
 # now handle leftover files in contentID_filenames
@@ -263,12 +266,12 @@ if len(contentID_filenames) > 0:
 	for f in contentID_filenames:
 		info = grab_metadata(f)
 		d = info['date']
-		print('Input:', f)
-		if d:
-			print(d)
+		#print('Input:', f)
+		#if d:
+		#	print(d)
 		dest = destination_from_date(d, f)
 		copy_handler(f, dest)
-		print('-')
+		#print('-')
 	print("---")
 
 skipped_files += len(duplicate_files)
