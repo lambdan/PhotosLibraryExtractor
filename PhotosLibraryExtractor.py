@@ -2,6 +2,12 @@ import exiftool, sys, shutil, os, hashlib
 from argparse import ArgumentParser
 #exiftool: http://github.com/smarnach/pyexiftool
 
+
+# Use this for finding metadata tags
+#with exiftool.ExifTool() as et:
+#		metadata = et.get_metadata(sys.argv[1])
+# 		sys.exit(1)
+
 parser = ArgumentParser()
 parser.add_argument('-i', action='store', dest='input', help='Folder with pictures you want to process a.k.a. input folder', required=True)
 parser.add_argument('-o', action='store', dest='output', help='Photos will be copied to this folder a.k.a. output folder', required=True)
@@ -67,6 +73,9 @@ def grab_metadata(fp):
 		metadata = et.get_metadata(fp)	
 
 	if 'EXIF:DateTimeOriginal' in metadata:
+	if 'QuickTime:ContentCreateDate' in metadata: # usually the date to go by for videos transcoded in Photos.app... CreateDate will be the transcode date for those
+		date = metadata['QuickTime:ContentCreateDate']
+	elif 'EXIF:DateTimeOriginal' in metadata:
 		date = metadata['EXIF:DateTimeOriginal']
 	elif 'EXIF:CreateDate' in metadata:
 		date = metadata['EXIF:CreateDate']
@@ -99,12 +108,19 @@ def destination_from_date(in_date, in_path):
 		hour = time.split(':')[0]
 		minute = time.split(':')[1]
 		second = time.split(':')[2]
+		if "+" in second:
+			s = second
+			second = s.split('+')[0]
+			offset = s.split('+')[1] # timezone offset, we dont need it but someday we might?
+		elif "-" in second: # i think there can be negative offsets too ?
+			s = second
+			second = s.split('-')[0]
+			offset = s.split('-')[1]
 
 		ext = os.path.splitext(f)[1]
 
 		folder_path = os.path.join(out_dir, year, month)
-		filename = year + "-" + month + "-" + day + "_" + hour + "." + minute + "." + second + ext
-		#filename = year + month + day + "-" + hour + minute + second + ext
+		filename = year + "-" + month + "-" + day + " " + hour + "." + minute + "." + second + ext
 	else: # no date
 		folder_path = os.path.join(out_dir, "Unknown Dates")
 		filename = f
@@ -119,42 +135,27 @@ def copy_handler(input_path,destination):
 	dest_folder = os.path.dirname(destination)
 
 	if not os.path.isdir(dest_folder):
-		#print("Making folder:", dest_folder)
 		os.makedirs(dest_folder)
-
-	# check if file already exists, if so hash it
-	# TODO just reuse the md5sum we got in the main loop isntead of redoing it here?
 
 	base = os.path.splitext( os.path.basename(destination) )[0]
 	ext = os.path.splitext( os.path.basename(destination) )[1]
-	if ext.lower() == ".jpeg":
-		print("Changing .jpeg to .jpg")
+	if ext.lower() == ".jpeg": # change jpeg to jpg for consistency
 		ext = ".jpg"
 
-	i = 0
-	new_name = base + "-" + str(i) + ext
+	i = 97 # 97 is a
+	new_name = base + ext
 	final_path = (os.path.join(dest_folder, new_name))
 	while os.path.isfile(final_path):
-		#print("File already exists, incrementing number")
-
-		#print("Hmm, this file already exists:", final_path)
-		#print("Let's see if its identical to this file we're trying to copy:")
 		existing_file_hash = md5sum(final_path)
-		#print("MD5 of existing file:\t", existing_file_hash)
 		new_file_hash = md5sum(input_path)
-		#print("MD5 of new file:\t", new_file_hash)
 
 		if existing_file_hash == new_file_hash:
-			#print("Yep, they're identical. Moving on...")
 			return
 		else:
-			#print("Oh! They're not identical! I'll copy the new file and add a number to it then. Let's try with number " + str(i) + ".")
-			new_name = base + "-" + str(i) + ext
+			new_name = base + chr(i) + ext # append letter to filename if it already exists
 			final_path = (os.path.join(dest_folder, new_name))
-		#print("Let's try with this instead:", final_path)
 		i += 1
 
-	#print("Copying to:", final_path)
 	print(input_path, "-->", final_path)
 	files_copied += 1
 	shutil.copy(input_path, final_path)
@@ -163,18 +164,6 @@ def copy_handler(input_path,destination):
 def add_to_processed_files(filepath):
 	with open(already_processed_db, 'a') as sf:
 		sf.write(filepath + '\n')
-
-# Use this for finding metadata tags
-#with exiftool.ExifTool() as et:
-#		metadata = et.get_metadata(sys.argv[1])
-#print(metadata)
-#EXIF:DateTimeOriginal
-#EXIF:CreateDate
-#EXIF:ModifyDate
-#MakerNotes:ContentIdentifier
-#QuickTime:CreateDate
-#sys.exit(1)
-
 
 # Read previously handled files
 if os.path.isfile(already_processed_db):
