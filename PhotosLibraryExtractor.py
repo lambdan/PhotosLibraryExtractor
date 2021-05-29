@@ -126,8 +126,6 @@ def destination_from_date(in_date, in_path):
 		filename = f
 
 	final = os.path.join(folder_path, filename)
-	#print("Destination:", final)
-	#print("DIR NAME:", os.path.dirname(final))
 	return final
 
 def copy_handler(input_path,destination):
@@ -182,25 +180,19 @@ skipped_files = len(previously_handled_files)
 for dirpath, dirnames, filenames in os.walk(in_dir):
 	for f in filenames:
 		if f in ignored_files or os.path.splitext(f)[1].lower() in ignored_file_exts:
-			print("Ignoring", f)
+			print("Ignored:", f)
 			continue # ignore
 
 		in_file = os.path.abspath(os.path.join(dirpath,f))
 
 		if in_file in previously_handled_files:
-			#print("Skipping because we have handled it before:", in_file)
-			#print("-")
 			continue
-
-		#print("Input:", in_file)
-
 		
 		md5 = md5sum(in_file)
 		if md5 in handled_files:
-			print("Duplicate file:", f)
+			print("Duplicate:", f)
 			duplicate_files.append(in_file)
 			add_to_processed_files(in_file)
-			print("-")
 			continue
 		
 		info = grab_metadata(in_file)
@@ -215,7 +207,7 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 
 		if cID: # has content id, could be a live photo
 			if cID in contentID_IDs: # Found live photo?
-				print("This seems to be the other part of a Live Photo... let's copy them together")
+				#print("This seems to be the other part of a Live Photo... let's copy them together")
 				matched_filename = contentID_filenames[contentID_IDs.index(cID)]
 
 				if ext.lower() == '.mov':
@@ -255,6 +247,7 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 
 # now handle leftover files in contentID_filenames
 if len(contentID_filenames) > 0:
+	print("---")
 	print("There are", len(contentID_filenames), "files with unpaired Content IDs left")
 	for f in contentID_filenames:
 		info = grab_metadata(f)
@@ -273,3 +266,4 @@ print("Files processed:", len(handled_files))
 print("Files copied:", files_copied)
 print("Skipped files:", skipped_files)
 #print("Ignored files (duplicates):", len(duplicate_files))
+Print("Done")
