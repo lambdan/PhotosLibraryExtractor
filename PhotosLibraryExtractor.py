@@ -19,6 +19,10 @@ if ".photoslibrary" in in_dir:
 	test_PhotosLibrary_path = os.path.join(in_dir, "originals/")
 	if os.path.isdir(test_PhotosLibrary_path):
 		in_dir = test_PhotosLibrary_path
+	
+	test_PhotosLibrary_path = os.path.join(in_dir, "Masters/") # high sierra
+	if os.path.isdir(test_PhotosLibrary_path):
+		in_dir = test_PhotosLibrary_path
 
 out_dir = os.path.abspath(parsed.output)
 if parsed.db_path:
