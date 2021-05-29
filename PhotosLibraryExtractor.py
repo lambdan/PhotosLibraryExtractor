@@ -71,8 +71,8 @@ def md5sum(filename):
 def grab_metadata(fp):
 	with exiftool.ExifTool() as et:
 		metadata = et.get_metadata(fp)	
-
-	if 'EXIF:DateTimeOriginal' in metadata:
+	#print(metadata)
+	
 	if 'QuickTime:ContentCreateDate' in metadata: # usually the date to go by for videos transcoded in Photos.app... CreateDate will be the transcode date for those
 		date = metadata['QuickTime:ContentCreateDate']
 	elif 'EXIF:DateTimeOriginal' in metadata:
