@@ -8,7 +8,11 @@ parser.add_argument('-o', action='store', dest='output', help='Photos will be co
 parser.add_argument('-db', action='store', dest='db_path', help='Path to PLEDB file', required=False)
 parsed = parser.parse_args()
 
+ignored_files = [".DS_Store", "PLEDB"]
+ignored_file_exts = [".bat", ".sh", ".py", ".zip", ".7z"]
+
 in_dir = os.path.abspath(parsed.input)
+
 
 # Check if input is a .photoslibrary, if so correct it to point to the originals folder
 if ".photoslibrary" in in_dir:
@@ -181,8 +185,9 @@ skipped_files = len(previously_handled_files)
 # Main loop
 for dirpath, dirnames, filenames in os.walk(in_dir):
 	for f in filenames:
-		if f == ".DS_Store": 
-			continue # ignore .DS_Store files
+		if f in ignored_files or os.path.splitext(f)[1].lower() in ignored_file_exts:
+			print("Ignoring", f)
+			continue # ignore
 
 		in_file = os.path.abspath(os.path.join(dirpath,f))
 
