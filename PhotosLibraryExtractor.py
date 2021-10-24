@@ -1,4 +1,5 @@
 import exiftool, sys, shutil, os, hashlib
+from tqdm import tqdm
 from argparse import ArgumentParser
 #exiftool: http://github.com/smarnach/pyexiftool
 
@@ -152,17 +153,17 @@ if os.path.isfile(already_processed_md5):
 
 # Main loop
 for dirpath, dirnames, filenames in os.walk(in_dir):
-	for f in filenames:
+	for f in tqdm(filenames, desc=dirpath):
 
 		if f in ignored_files or os.path.splitext(f)[1].lower() in ignored_file_exts:
-			print("Ignored:", f)
+			#print("Ignored:", f)
 			continue # ignore
 
 		in_file = os.path.abspath(os.path.join(dirpath,f))
 		
 		md5 = md5sum(in_file)
 		if md5 in handled_md5s:
-			print("Duplicate hash:", f)
+			#print("Duplicate hash:", f)
 			continue
 		
 		info = grab_metadata(in_file)
