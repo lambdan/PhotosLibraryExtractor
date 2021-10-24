@@ -2,19 +2,17 @@ import exiftool, sys, shutil, os, hashlib
 from argparse import ArgumentParser
 #exiftool: http://github.com/smarnach/pyexiftool
 
-
 # Use this for finding metadata tags
 #with exiftool.ExifTool() as et:
 #		metadata = et.get_metadata(sys.argv[1])
 # 		sys.exit(1)
 
 parser = ArgumentParser()
-parser.add_argument('-i', action='store', dest='input', help='Folder with pictures you want to process a.k.a. input folder', required=True)
-parser.add_argument('-o', action='store', dest='output', help='Photos will be copied to this folder a.k.a. output folder', required=True)
-parser.add_argument('-db', action='store', dest='db_path', help='Path to PLEDB file', required=False)
+parser.add_argument('-i', action='store', dest='input', help='Folder with photos', required=True)
+parser.add_argument('-o', action='store', dest='output', help='Photos will be copied here', required=True)
 parsed = parser.parse_args()
 
-ignored_files = [".DS_Store", "PLEDB"]
+ignored_files = [".DS_Store", "PLEDB", "PLEDB_Hashes.txt"]
 ignored_file_exts = [".bat", ".sh", ".py", ".zip", ".7z"]
 
 in_dir = os.path.abspath(parsed.input)
@@ -31,14 +29,10 @@ if ".photoslibrary" in in_dir:
 		in_dir = test_PhotosLibrary_path
 
 out_dir = os.path.abspath(parsed.output)
-if parsed.db_path:
-	already_processed_db = os.path.abspath(parsed.db_path)
-else:
-	already_processed_db = os.path.join(out_dir, 'PLEDB')
+already_processed_md5 = os.path.join(out_dir, 'PLEDB_Hashes.txt')
 
 print("Input folder:", in_dir)
 print("Destination:", out_dir)
-print("DB file:", already_processed_db)
 print("---")
 
 if not os.path.isdir(in_dir):
@@ -51,22 +45,15 @@ if not os.path.isdir(out_dir):
 
 contentID_filenames = [] # for Live Photos
 contentID_IDs = []
-handled_files = []
-previously_handled_files = []
-duplicate_files = []
-files_copied = 0
+handled_md5s = []
 
 def md5sum(filename):
-	size = os.path.getsize(filename)
-
-	h = hashlib.md5()
-	with open(filename, 'rb') as file:
-		chunk = 0
-		while chunk != b'':
-			chunk = file.read(1024)
-			h.update(chunk)
-
-	return h.hexdigest()
+	with open(filename, "rb") as f:
+		file_hash = hashlib.blake2b()
+		while chunk := f.read(8192):
+			file_hash.update(chunk)
+	#print(filename, file_hash.hexdigest())
+	return file_hash.hexdigest()
 
 def grab_metadata(fp):
 	with exiftool.ExifTool() as et:
@@ -120,7 +107,7 @@ def destination_from_date(in_date, in_path):
 		ext = os.path.splitext(f)[1]
 
 		folder_path = os.path.join(out_dir, year, month)
-		filename = year + "-" + month + "-" + day + " " + hour + "." + minute + "." + second + ext
+		filename = year + "-" + month + "-" + day + "_" + hour + "." + minute + "." + second + ext
 	else: # no date
 		folder_path = os.path.join(out_dir, "Unknown Dates")
 		filename = f
@@ -129,7 +116,6 @@ def destination_from_date(in_date, in_path):
 	return final
 
 def copy_handler(input_path,destination):
-	global files_copied
 	dest_folder = os.path.dirname(destination)
 
 	if not os.path.isdir(dest_folder):
@@ -140,8 +126,8 @@ def copy_handler(input_path,destination):
 	if ext.lower() == ".jpeg": # change jpeg to jpg for consistency
 		ext = ".jpg"
 
-	i = 97 # 97 is a
-	new_name = base + ext
+	i = 0
+	new_name = base + "-" + str(i).zfill(2) + ext
 	final_path = (os.path.join(dest_folder, new_name))
 	while os.path.isfile(final_path):
 		existing_file_hash = md5sum(final_path)
@@ -150,49 +136,33 @@ def copy_handler(input_path,destination):
 		if existing_file_hash == new_file_hash:
 			return
 		else:
-			new_name = base + chr(i) + ext # append letter to filename if it already exists
+			new_name = base + "-" + str(i).zfill(2) + ext # append letter to filename if it already exists
 			final_path = (os.path.join(dest_folder, new_name))
 		i += 1
 
-	print(input_path, "-->", final_path)
-	files_copied += 1
+	print("Copying", input_path, "-->", final_path)
 	shutil.copy(input_path, final_path)
 
-
-def add_to_processed_files(filepath):
-	with open(already_processed_db, 'a') as sf:
-		sf.write(filepath + '\n')
-
-# Read previously handled files
-if os.path.isfile(already_processed_db):
-	print("Reading", already_processed_db)
-	with open(already_processed_db) as f:
+if os.path.isfile(already_processed_md5):
+	with open(already_processed_md5) as f:
 		lines = f.readlines()
 	for line in lines:
-		previously_handled_files.append(line.rstrip())
-	print(len(previously_handled_files), "files in PLEDB")
-	print("They will be skipped this run. If you want to start fresh, delete the file:", already_processed_db)
-	print("---")
+		handled_md5s.append(line.rstrip())
 
-skipped_files = len(previously_handled_files)
 
 # Main loop
 for dirpath, dirnames, filenames in os.walk(in_dir):
 	for f in filenames:
+
 		if f in ignored_files or os.path.splitext(f)[1].lower() in ignored_file_exts:
 			print("Ignored:", f)
 			continue # ignore
 
 		in_file = os.path.abspath(os.path.join(dirpath,f))
-
-		if in_file in previously_handled_files:
-			continue
 		
 		md5 = md5sum(in_file)
-		if md5 in handled_files:
-			print("Duplicate:", f)
-			duplicate_files.append(in_file)
-			add_to_processed_files(in_file)
+		if md5 in handled_md5s:
+			print("Duplicate hash:", f)
 			continue
 		
 		info = grab_metadata(in_file)
@@ -240,9 +210,7 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 			dest = destination_from_date(d, in_file)
 			copy_handler(in_file, dest)
 
-		handled_files.append(md5)
-		add_to_processed_files(in_file)
-		#print('-')
+		handled_md5s.append(md5)
 
 
 # now handle leftover files in contentID_filenames
@@ -260,10 +228,9 @@ if len(contentID_filenames) > 0:
 		#print('-')
 	print("---")
 
-skipped_files += len(duplicate_files)
+# write handled_md5s
+with open(already_processed_md5, "w") as f:
+	for h in handled_md5s:
+		f.write(h + "\n")
 
-print("Files processed:", len(handled_files))
-print("Files copied:", files_copied)
-print("Skipped files:", skipped_files)
-#print("Ignored files (duplicates):", len(duplicate_files))
 print("Done")
