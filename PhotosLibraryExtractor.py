@@ -14,8 +14,8 @@ VIDS_ONLY = False
 parser = ArgumentParser()
 parser.add_argument('-i', action='store', dest='input', help='Folder with photos', required=True)
 parser.add_argument('-o', action='store', dest='output', help='Photos will be copied here', required=True)
-parser.add_argument('-pics', dest='picsonly', action='store_true')
-parser.add_argument('-vids', dest='vidsonly', action='store_true')
+parser.add_argument('-pics', dest='picsonly', action='store_true', help='Process pictures only')
+parser.add_argument('-vids', dest='vidsonly', action='store_true', help='Process videos only')
 parser.set_defaults(picsonly=False, vidsonly=False)
 parsed = parser.parse_args()
 
@@ -77,7 +77,9 @@ def grab_metadata(fp):
 		metadata = et.get_metadata(fp)	
 	#print(metadata)
 	
-	if 'QuickTime:ContentCreateDate' in metadata: # usually the date to go by for videos transcoded in Photos.app... CreateDate will be the transcode date for those
+	if 'QuickTime:CreationDate' in metadata:
+		date = metadata["QuickTime:CreationDate"]
+	elif 'QuickTime:ContentCreateDate' in metadata: # usually the date to go by for videos transcoded in Photos.app... CreateDate will be the transcode date for those
 		date = metadata['QuickTime:ContentCreateDate']
 	elif 'EXIF:DateTimeOriginal' in metadata:
 		date = metadata['EXIF:DateTimeOriginal']
