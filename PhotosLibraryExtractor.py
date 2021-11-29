@@ -8,13 +8,29 @@ from argparse import ArgumentParser
 #		metadata = et.get_metadata(sys.argv[1])
 # 		sys.exit(1)
 
+PICS_ONLY = False
+VIDS_ONLY = False
+
 parser = ArgumentParser()
 parser.add_argument('-i', action='store', dest='input', help='Folder with photos', required=True)
 parser.add_argument('-o', action='store', dest='output', help='Photos will be copied here', required=True)
+parser.add_argument('-pics', dest='picsonly', action='store_true')
+parser.add_argument('-vids', dest='vidsonly', action='store_true')
+parser.set_defaults(picsonly=False, vidsonly=False)
 parsed = parser.parse_args()
+
+if parsed.picsonly:
+	print("*** PICS ONLY ***")
+	PICS_ONLY = True
+	VIDS_ONLY = False
+elif parsed.vidsonly:
+	print("*** VIDS ONLY ***")
+	PICS_ONLY = False
+	VIDS_ONLY = True
 
 ignored_files = [".DS_Store", "PLEDB", "PLEDB_Hashes.txt"]
 ignored_file_exts = [".bat", ".sh", ".py", ".zip", ".7z"]
+video_exts = [".mov", ".mp4", ".avi", ".m4v", ".mkv"]
 
 in_dir = os.path.abspath(parsed.input)
 
@@ -154,13 +170,18 @@ if os.path.isfile(already_processed_md5):
 # Main loop
 for dirpath, dirnames, filenames in os.walk(in_dir):
 	for f in tqdm(filenames, desc=dirpath):
+		in_file = os.path.abspath(os.path.join(dirpath,f))
+		ext = os.path.splitext(in_file)[1]
 
-		if f in ignored_files or os.path.splitext(f)[1].lower() in ignored_file_exts:
+		if f in ignored_files or ext in ignored_file_exts:
 			#print("Ignored:", f)
 			continue # ignore
 
-		in_file = os.path.abspath(os.path.join(dirpath,f))
-		
+		if ext in video_exts and PICS_ONLY:
+			continue
+		elif ext not in video_exts and VIDS_ONLY:
+			continue
+	
 		md5 = md5sum(in_file)
 		if md5 in handled_md5s:
 			#print("Duplicate hash:", f)
