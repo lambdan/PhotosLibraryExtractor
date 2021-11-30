@@ -182,7 +182,7 @@ if os.path.isfile(already_processed_md5):
 for dirpath, dirnames, filenames in os.walk(in_dir):
 	for f in tqdm(filenames, desc=dirpath):
 		in_file = os.path.abspath(os.path.join(dirpath,f))
-		ext = os.path.splitext(in_file)[1]
+		ext = os.path.splitext(in_file)[1].lower()
 
 		if f in ignored_files or ext in ignored_file_exts:
 			#print("Ignored:", f)
