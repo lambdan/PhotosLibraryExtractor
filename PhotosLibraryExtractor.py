@@ -162,6 +162,15 @@ def copy_handler(input_path,destination):
 	print("Copying", input_path, "-->", final_path)
 	shutil.copy(input_path, final_path)
 
+def logError(msg):
+	print(msg)
+	with open("PhotosLibraryExtractor.errors.log","a",errors="backslashreplace") as f:
+		f.write(msg+"\n")
+
+def writeHash(h,path):
+	with open(path,"a") as f:
+		f.write(h+"\n")
+
 if os.path.isfile(already_processed_md5):
 	with open(already_processed_md5) as f:
 		lines = f.readlines()
@@ -189,7 +198,13 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 			#print("Duplicate hash:", f)
 			continue
 		
-		info = grab_metadata(in_file)
+
+		try:
+			info = grab_metadata(in_file)
+		except Exception as e:
+			logError(str(e) + ": " + in_file)
+			continue
+			
 		d = info['date']
 		cID = info['content_ID']
 		ext = os.path.splitext(in_file)[1]
@@ -235,6 +250,7 @@ for dirpath, dirnames, filenames in os.walk(in_dir):
 			copy_handler(in_file, dest)
 
 		handled_md5s.append(md5)
+		writeHash(md5,already_processed_md5)
 
 
 # now handle leftover files in contentID_filenames
@@ -253,8 +269,8 @@ if len(contentID_filenames) > 0:
 	print("---")
 
 # write handled_md5s
-with open(already_processed_md5, "w") as f:
-	for h in handled_md5s:
-		f.write(h + "\n")
+#with open(already_processed_md5, "w") as f:
+#	for h in handled_md5s:
+#		f.write(h + "\n")
 
 print("Done")
